@@ -216,6 +216,130 @@ const game = {
     }
 }
 
+function changeHTML(button){
+    let buttonClass = '.Button._'+ button;
+    let buttonNumber = document.querySelector(buttonClass);
+    buttonNumber.innerHTML = player.getValue();   
+    addMove( buttonNumber.innerHTML, button );
+}
+
+function computerMoveSmart() {
+    gameboard();
+    getGB();
+    getSolutions();
+
+    // When Computer needs to make the first move
+    // playerValue doesn't existed yet. So now it gets created!
+    try {
+        playerValue == 'O';
+    } catch (error) {
+        playerValue = 'O';
+    }
+
+    let listCountX = [];
+    let listCountO = [];
+    for (let option = 0; option < solutions.length; option++){
+        let arrayCountO = 0;
+        let arrayCountX = 0;
+       // Count X and O in  every array 
+        // Save them in seperate list:
+        for (let i = 0; i < solutions[option].length; i++){
+            console.log('Array = '+ solutions[option]);
+            if (solutions[option][i] == 'O') {
+                arrayCountO = arrayCountO +1; 
+            } else if (solutions[option][i] == 'X') {
+                arrayCountX = arrayCountX +1;
+            }
+            listCountX.push(arrayCountX);
+            listCountO.push(arrayCountO);
+        }
+    }
+    
+    
+    if (playerValue == 'X') {
+        for (let option = 0; option < solutions.length; option++){
+            let countO = 0;
+            let countX = 0;
+            let countEmpty = 0;
+            let emptySpace = '';
+            let conditionMet = false;
+            let totalCount = 0; 
+            let blokken = true; 
+    
+            // Count total moves made in the game
+            for (let moves = 0; moves < gameboard().length; moves++) {
+                if (gameboard()[moves] == 'X') {
+                    totalCount = totalCount + 1;
+                }
+                else if (gameboard()[moves] == 'O') {
+                    totalCount = totalCount + 1;
+                }
+            }
+    
+            // Loop thru game solutions 
+            for (let i = 0; i < solutions[option].length; i++){
+                console.log('Array = '+ solutions[option]);
+                if (solutions[option][i] == 'O') {
+                    countO = countO +1; 
+                } else if (solutions[option][i] == 'X') {
+                    countX = countX +1;
+                } else if (solutions[option][i] == ''){
+                    countEmpty = countEmpty +1;
+                    emptySpace = smartSolutions[option][i];
+                }
+            }
+            
+            
+            // console.log('countX = '+ countX);
+            // console.log('countO = '+ countO);
+            // console.log('countEmpty = '+ countEmpty);
+            // console.log('emptySpace = '+ emptySpace);
+
+            let sortedListCountO = listCountO.slice().sort().reverse();
+            let sortedListCountX = listCountX.slice().sort().reverse();
+
+            console.log(sortedListCountO);
+            console.log('countX = ' +countX);
+            console.log('countEmpty = ' +countEmpty);
+            console.log('conditionMet = ' +conditionMet);
+            console.log('sortedListCountO[0] = ' +sortedListCountO[0]);
+            
+            if (countX == 2 && countO == 0 && countEmpty == 1 && !conditionMet && sortedListCountO[0] != 2 ){
+                console.log('Blokken!!!');
+                console.log('emptySpace = '+ emptySpace);
+                changeHTML(emptySpace);
+                blokken = false;
+                break;
+            }
+            else if (countO == 2 && countX == 0 && countEmpty == 1 && !conditionMet){
+                console.log('Winnen!! 3 op een rij');
+                console.log('emptySpace = '+ emptySpace);
+                conditionMet = true;
+                changeHTML(emptySpace);
+                break;
+            }
+            else if (countO == 1 && countX == 0 && countEmpty == 2 && !conditionMet && sortedListCountX[0] != 2){
+                console.log('Zet een tweede neer');
+                console.log('emptySpace = '+ emptySpace);
+                conditionMet = true;
+                changeHTML(emptySpace);
+                break;
+            } 
+            else if (totalCount == 1){
+                console.log('Random!! --> First move O!');
+                computerMoveRandom(gameboard);
+                break;
+            }    
+            else if (!blokken){
+                console.log('Random!!');
+                computerMoveRandom(gameboard);
+                break;
+            }
+        }
+    }
+};
+computerMoveSmart();
+
 function computerMoveRandom(gameboard) {
     getMove = true;
     while (getMove) {
